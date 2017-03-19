@@ -1,5 +1,8 @@
-Doit contenir une description succincte de votre travail. Voici donc:
-La mise en route du projet était la partie la plus longue.
-Difficulté rencontrées: aucune en particuler si ce n'es quelque erreur de typage lors de l'inférences sur la fonction tp_expr.
-Le travail a principalement consister à comprendre les questions et le but derrières ces dernières.
-L'exercice 5 est se trouve dans le fichier test.ml qui permet de vérifier toutes les fonctions écrites précedement.
+################ Part 1: ################
+#Difficulties:
+The main difficulty of the project was to init it and prepare the environement for best workflow.
+#Work:
+The work was mainly to understand the questions and the wanted goal to achieve thanks to them.
+
+################ Part 2: ################
+Work in progress..
