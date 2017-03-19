@@ -6,11 +6,13 @@ To install the project you have to **download** the .zip file or **clone** the d
 This done you will need to launch a **make** command in the dowloaded directory.
 After that there's no more to do! The project is installed.
 
-## Part 1:
+# Work
+## Part 1
+Implementing type verification and code generation for expressions.
 ### Difficulties:
-The main difficulty of the project was to init it and prepare the environement for best workflow.
-### Work:
-The work was mainly to understand the questions and the wanted goal to achieve thanks to them.
+Prepare the environement to provide the best workflow.
+Some type error when Caml was inferencing the *tp_expr* function.
 
-## Part 2:
+## Part 2
+Final project with a working compilator.
 Work in progress..
