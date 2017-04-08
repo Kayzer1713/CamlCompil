@@ -40,7 +40,7 @@ let auxConst = function
 (*Take a var name and return the type of this var in the current env
 Raise an exception is the var doesn't exist in the current env*)
 let rec auxVar = function
-    (name, (nomV, tpV)::listVar) -> if name = nomV then tpV else auxVar(name, listVar)
+    (name, (nomV, tpV)::varList) -> if name = nomV then tpV else auxVar(name, varList)
   | _ -> raise TypeNotMatching
 ;;
 
@@ -54,10 +54,11 @@ let binopAux = function
 (*Take a fonction name and the funbind of the current env and return a couple
 composed by the tp and the vardecl list of this function in the current env*)
 let rec auxCallE = function
-    (funName, (Fundecl (tp, fname, listArg))::listFun) -> if funName = fname then (tp,listArg) else auxCallE(funName, listFun)
+    (funName, (Fundecl (tp, fname, argList))::funList) -> if funName = fname then (tp,argList) else auxCallE(funName, funList)
   | _ -> raise UndefinedFunction
 ;;
 
+(*function that type an expr in a given env*)
 let rec tp_expr env = function
     Const (_, c) -> Const ((auxConst c),c)
   | VarE (_, Var (bind, name)) -> if bind = Local then VarE ((auxVar(name,env.localvar)), Var (bind, name)) else VarE ((auxVar(name,env.globalvar)), Var (bind, name))
@@ -76,4 +77,20 @@ let rec tp_expr env = function
                                                   | (_,[]) -> raise MissingArguments
                                                   | ([],_) -> raise TooManyArguments
                                                 in  CallE(fType, fName, argTest(argList, givenArgs))
+;;
+(* Function that allow to apply an other function to each element of a list *)
+let rec listmap f = function
+   [] -> []
+  | (a::l) -> (f a)::(listmap f l)
+;;
+
+(*function that type a statement in a given env*)
+let rec tp_stmt = function env -> function
+    Skip -> Skip
+  | Assign (t, v, e) -> Assign(VoidT, v, (tp_expr env e))
+  | Seq (s1, s2) -> Seq((tp_stmt env s1), (tp_stmt env s2))
+  | Cond (e, c1, c2) -> Cond((tp_expr env e), (tp_stmt env c1), (tp_stmt env c2))
+  | While (e, stmt) -> While((tp_expr env e), (tp_stmt env stmt))
+  | CallC (c, exprList) -> CallC(c, (listmap (tp_expr env) exprList))
+  | Return e -> Return(tp_expr env e)
 ;;

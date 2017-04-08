@@ -19,14 +19,3 @@ let rec gen_expr varList = function
                                 (gen_expr_better_than_ever e1) @ (gen_expr_better_than_ever e2) @ [Bininst (tp,op)]
   | _ -> failwith "not implemented yet!"
 ;;
-
-
-(* ************************************************************ *)
-(* **** Compilation of methods / programs                  **** *)
-(* ************************************************************ *)
-let gen_prog (Prog (gvds, fdfs)) =
-  JVMProg ([],
-    [Methdefn (Methdecl (IntT, "even", [IntT]),
-    Methinfo (3, 1),
-    ((gen_expr (["n"]) (tp_expr env expr))@[ReturnI IntT]))])
-;;
