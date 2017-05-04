@@ -95,7 +95,7 @@ let rec tp_stmt env = function
                           then Cond(typed_expr, (tp_stmt env c1), (tp_stmt env c2))
                           else raise TypeNotMatching
   | While (e, stmt) -> While((tp_expr env e), (tp_stmt env stmt))
-  | CallC (c, exprList) -> CallC(c, (listmap (tp_expr env) exprList))
+  | CallC (c, exprList) -> CallC(c, (List.map (tp_expr env) exprList))
   | Return e -> Return(tp_expr env e)
 ;;
 
