@@ -73,6 +73,27 @@ let rec gen_stmt varList path = function
 	| Return returnExpr -> [ReturnI (tp_of_expr returnExpr)]
 ;;
 
+(*Function that take a Vardecl list and return in the rigth order a list of type of those var*)
+let rec varTypeList = function
+    [] -> []
+  | (Vardecl (tpVar, _)::l) -> tpVar::(varTypeList l)
+;;
+
+(*Function that take a liste of Vardecl and return in the rigth order the list of name of those var*)
+let rec varNameList = function
+    [] -> []
+  | (Vardecl (_, varName)::l) -> varName::(varNameList l)
+;;
+
+(*function that translate a fun declaration*)
+let gen_fundefn = function Fundefn (Fundecl (fType, fName, fArgs), varList, funStmt) ->
+	Methdefn (
+    Methdecl (fType, fName, (varTypeList fArgs)),
+    Methinfo (2, 1),
+    (gen_stmt ((varNameList varList) @ (varNameList fArgs)) [] funStmt)
+  )
+;;
+
 (*Compilation funcion*)
 let gen_prog (Prog (gvds, fdfs)) =
   JVMProg ([],

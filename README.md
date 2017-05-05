@@ -52,9 +52,11 @@ Same as exercise 9 but for stmts.
 * gen_stmt()
 
 ### Exercise 11
-
+Added the gen for function declarations.
   Implemented:
-* gen_stmt()
+* varTypeList()
+* varNameList()
+* gen_fundefn()
 
 ### Exercise 12
 
