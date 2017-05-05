@@ -90,7 +90,7 @@ let rec tp_stmt env = function
     Skip -> Skip
   | Assign (t, v, e) -> Assign(VoidT, v, (tp_expr env e))
   | Seq (s1, s2) -> Seq((tp_stmt env s1), (tp_stmt env s2))
-  | Cond (e, c1, c2) -> let typed_expr = (tp_expr env e) in
+  | Cond (c, c1, c2) -> let typed_expr = (tp_expr env c) in
                         if tp_of_expr(typed_expr) = BoolT
                           then Cond(typed_expr, (tp_stmt env c1), (tp_stmt env c2))
                           else raise TypeNotMatching

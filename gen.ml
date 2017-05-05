@@ -29,12 +29,48 @@ let rec gen_expr varList path = function
     @ (gen_expr varList vFalse e2)
     @ [Label vEnd]
   | CallE (tp, fname, givenArgs) ->
-  let rec genCallE instr_list type_list = function
-    | [] -> (instr_list, type_list)
-    | (e::l) -> let instrElt = (gen_expr varList path e) and tpElt = (tp_of_expr e) in
-      genCallE (instr_list @ instrElt) (type_list @ [tpElt]) l
-  in let (instr_list, type_list) = (genCallE [] [] givenArgs) in
-  instr_list @ [Invoke (tp, fname, type_list)] @ [ReturnI tp]
+    let rec exprToInstrList instr_list type_list = function
+      | [] -> (instr_list, type_list)
+      | (e::l) -> let instrElt = (gen_expr varList path e) and tpElt = (tp_of_expr e) in
+          exprToInstrList (instr_list @ instrElt) (type_list @ [tpElt]) l in
+            let (instr_list, type_list) = (exprToInstrList [] [] givenArgs) in
+              instr_list
+              @ [Invoke (tp, fname, type_list)]
+              @ [ReturnI tp]
+;;
+
+(*Same as gen_expr but for stmt instead of epr*)
+let rec gen_stmt varList path = function
+    Skip -> [Nop]
+  | Assign (tp, Var (tpVar, nVar), e) -> (gen_expr varList path e) @ [Storev (tp, position(nVar, varList))]
+	| Seq (s1, s2) -> (gen_stmt varList path s1) @ (gen_stmt varList path s2)
+	| Cond (c, c1, c2) -> let vFalse = path @ [0] and vEnd = path @ [2] in
+		(gen_expr varList vEnd c)
+    @ [Loadc (IntT, (IntV 0))]
+    @ [If (BCeq, vFalse)]
+    @ (gen_stmt varList (path @ [1]) c1)
+    @ [Goto vEnd]
+    @ [Label vFalse]
+    @ (gen_stmt varList vFalse c2)
+    @ [Label vEnd]
+	| While (e, stmt) -> let vFalse = path @ [0] and whileStmt = path @ [1] in
+		[Label whileStmt]
+    @ (gen_expr varList (path @ [2]) e)
+    @ [Loadc (IntT, (IntV 0))]
+    @ [If (BCeq, vFalse)]
+    @ (gen_stmt varList whileStmt stmt)
+    @ [Goto whileStmt]
+    @ [Label vFalse] @ [Nop]
+  | CallC (c, stmt) ->
+    let rec stmtToInstrList instr_list type_list = function
+      | [] -> (instr_list, type_list)
+      | (e::l) -> let instrElt = (gen_expr varList path e) and tpElt = (tp_of_expr e) in
+          stmtToInstrList (instr_list @ instrElt) (type_list @ [tpElt]) l in
+            let (instr_list, type_list) = (stmtToInstrList [] [] stmt) in
+              instr_list
+              @ [Invoke (VoidT, c, type_list)]
+              @ [ReturnI VoidT]
+	| Return returnExpr -> [ReturnI (tp_of_expr returnExpr)]
 ;;
 
 (*Compilation funcion*)
