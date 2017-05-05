@@ -95,9 +95,4 @@ let gen_fundefn = function Fundefn (Fundecl (fType, fName, fArgs), varList, funS
 ;;
 
 (*Compilation funcion*)
-let gen_prog (Prog (gvds, fdfs)) =
-  JVMProg ([],
-           [Methdefn (Methdecl (IntT, "even", [IntT]),
-                      Methinfo (3, 1),
-                      [Loadc (IntT, IntV 0); ReturnI IntT])])
-  ;;
+let gen_prog = function Prog (globalVars, funList) -> JVMProg ([], List.map gen_fundefn funList);;

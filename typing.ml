@@ -11,15 +11,6 @@ type environment =
      returntp: tp;
      funbind: fundecl list}
 
-let tp_of_vardecl (Vardecl (t, _)) = t;;
-let tp_of_expr = function
-   Const (t, _) -> t
- | VarE (t, _) -> t
- | BinOp (t, _, _, _) -> t
- | IfThenElse (t, _, _, _) -> t
- | CallE (t, _, _) -> t;;
-
-(* TODO: put your definitions here *)
 let tp_prog (Prog (gvds, fdfs)) =
   Prog([],
        [Fundefn (Fundecl (BoolT, "even", [Vardecl (IntT, "n")]), [], Skip)])
@@ -133,8 +124,8 @@ let rec stmt_returns = function
 (*Check if a function is well typed. If not raise BadTypedFunction*)
 let tp_fdefn env = function Fundefn (Fundecl (funType, funName, funVars) as f, vars, stmt) ->
 	let varList = (listVarFun vars) in
-    let env2 = (updateEnv env varList funType) in
-      if (stmt_returns (tp_stmt env2 stmt)) && (functionStatmentVerif funType (tp_stmt env2 stmt))
+    let envT = (updateEnv env varList funType) in
+      if (stmt_returns (tp_stmt envT stmt)) && (functionStatmentVerif funType (tp_stmt envT stmt))
         then Fundefn (f, vars, stmt)
         else raise BadTypedFunction
 ;;

@@ -65,6 +65,11 @@ Added a function to check if each a function declaration end.
 * tp_fdefn()
 
 ### Exercise 13
+Turning stack limit into function to fit the code to compile.
+  Implemented:
+* listsum()
+* stack_depth_e()
+* stack_depth_c()
 
 ### Exercise 14
 # Still no finished...
