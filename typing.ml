@@ -119,13 +119,24 @@ let updateEnv env v = function tp ->
 	{localvar = v @ (env.localvar); globalvar = env.globalvar; returntp = tp; funbind = env.funbind}
 ;;
 
+(*checking if a function end*)
+let rec stmt_returns = function
+    Skip -> false
+  | Assign (_, _, _) -> false
+  | Seq (s1, s2) -> stmt_returns(s1) || stmt_returns(s2)
+  | Cond (_, c1, c2) -> stmt_returns(c1) || stmt_returns(c2)
+  | While (_, stmt) -> stmt_returns(stmt)
+  | CallC (_, _) -> true
+  | Return returnExpr -> true
+;;
+
 (*Check if a function is well typed. If not raise BadTypedFunction*)
 let tp_fdefn env = function Fundefn (Fundecl (funType, funName, funVars) as f, vars, stmt) ->
 	let varList = (listVarFun vars) in
     let env2 = (updateEnv env varList funType) in
-	   if (functionStatmentVerif funType (tp_stmt env2 stmt))
-     then Fundefn (f, vars, stmt)
-	     else raise BadTypedFunction
+      if (stmt_returns (tp_stmt env2 stmt)) && (functionStatmentVerif funType (tp_stmt env2 stmt))
+        then Fundefn (f, vars, stmt)
+        else raise BadTypedFunction
 ;;
 
 let tp_prog (Prog (globalvarList, funDeclList)) = Prog([],[Fundefn (Fundecl (BoolT, "even", [Vardecl (IntT, "n")]), [], Skip)]);;

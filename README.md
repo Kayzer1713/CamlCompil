@@ -59,7 +59,10 @@ Added the gen for function declarations.
 * gen_fundefn()
 
 ### Exercise 12
-
+Added a function to check if each a function declaration end.
+  Implemented:
+* stmt_returns()
+* tp_fdefn()
 
 ### Exercise 13
 
