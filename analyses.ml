@@ -65,3 +65,37 @@ let rec stack_depth_c = function
   | CallC (_, e) -> listsum (List.map stack_depth_e e)
 	| Return returnExpr -> stack_depth_e returnExpr
 ;;
+
+(*checking var for the expressions*)
+let rec defassign_e = function vs -> function
+    Const (tpC,valC) -> true
+	| VarE (tpV,Var(bd,nameV)) -> StringSet.mem nameV vs
+  | BinOp (tpB,typeBinop,exprB1,exprB2) -> (defassign_e vs exprB1) && (defassign_e vs exprB2 )
+ 	| IfThenElse (tpI, exprI1, exprI2, exprI3) -> (defassign_e vs exprI1) && (defassign_e vs exprI2) && (defassign_e vs exprI3)
+  | CallE (tpCE, nameCE, parametreC) ->
+    let rec aux = function [] -> true
+			| (a::q) -> defassign_e vs a && aux q in aux parametreC
+;;
+
+exception UndefinedVariable;;
+
+(*checking var for statements*)
+let rec defassign_c = function vs -> function
+	Skip -> vs
+  	| Assign(tpA,Var(_,nomA),exprA) -> if defassign_e vs exprA
+					   then (StringSet.add nomA vs)
+					   else raise UndefinedVariable
+  	| Seq(stmtS1,stmtS2) ->  StringSet.union (defassign_c vs stmtS1) (defassign_c vs stmtS2)
+  	| Cond (exprC1, stmtC1, stmtC2) ->  if defassign_e vs exprC1
+					    then StringSet.union (defassign_c vs stmtC1) (defassign_c vs stmtC2)
+					    else raise UndefinedVariable
+  	| While (exprW, stmtW) -> if defassign_e vs exprW
+				  then defassign_c vs stmtW
+				  else raise UndefinedVariable
+  	| CallC (nameC, listeExpr) -> let rec aux = function [] -> true
+							| (a::q) -> (defassign_e vs a) && aux (q)
+				      in if (aux (listeExpr)) then vs else raise UndefinedVariable
+  	| Return (exprR) -> if defassign_e vs exprR
+			    then vs
+			    else raise UndefinedVariable
+;;

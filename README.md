@@ -72,4 +72,7 @@ Turning stack limit into function to fit the code to compile.
 * stack_depth_c()
 
 ### Exercise 14
-# Still no finished...
+This part have been done with Hugo Clément and Pauline Fuzier
+  Implemented:
+* defassign_e()
+* defassign_c()
